@@ -104,6 +104,20 @@ public class RedisStreamUtil {
        List<ObjectRecord<String, T>> read = redisTemplate.opsForStream().read(clazz, StreamReadOptions.empty().count(count), StreamOffset.fromStart(key));
         return read;
     }
+    public <T> List<ObjectRecord<String, T>> xreadObjectGroup(String key, String group, String consumerName, Class<T> clazz) {
+        return xreadObjectGroup(key, group, consumerName, clazz);
+    }
+    public <T> List<ObjectRecord<String, T>> xreadObjectGroup(String key, String group, String consumerName ,Long count, Class<T> clazz) {
+        Consumer consumer = Consumer.from(group, consumerName);
+        List<ObjectRecord<String, T>> res = redisTemplate.opsForStream().read(clazz, consumer, StreamReadOptions.empty().count(count), StreamOffset.create(key, ReadOffset.lastConsumed()));
+        return res;
+    }
+
+    public <T> List<ObjectRecord<String, T>> xreadObjectGroup(String key, String group, String consumerName ,Long count, Long blockTime, Class<T> clazz) {
+        Consumer consumer = Consumer.from(group, consumerName);
+        List<ObjectRecord<String, T>> res = redisTemplate.opsForStream().read(clazz, consumer, StreamReadOptions.empty().count(count).block(Duration.ofMillis(blockTime)), StreamOffset.create(key, ReadOffset.lastConsumed()));
+        return res;
+    }
 
     public List<MapRecord<String, Object, Object>> xread(String key) {
         return xread(key, 1L);
