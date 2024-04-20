@@ -1,6 +1,7 @@
 package com.ai.dao.redis;
 
 import com.ai.BaseTest;
+import com.ai.common.core.domain.dto.UserOnlineDTO;
 import com.ai.dao.redis.utils.RedisStreamUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class StreamTest extends BaseTest {
     public void testAdd() {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("key1", "value1");
-        redisStreamUtil.addMap("queueName", hashMap);
+        redisStreamUtil.xadd("queueName", hashMap);
     }
 
     @Test
@@ -43,14 +44,46 @@ public class StreamTest extends BaseTest {
 
     @Test
     public void read() {
-        List<MapRecord<String, Object, Object>> queueName = redisStreamUtil.read("queueName");
+        List<MapRecord<String, Object, Object>> queueName = redisStreamUtil.xread("queueName");
 //        [MapBackedRecord{recordId=1713540395997-0, kvMap={key1=value1}}]
         System.out.println(queueName);
     }
 
     @Test
-    public void readByGroup() {
-//        redisStreamUtil.read("queueName", "g1");
+    public void createByGroup() {
+        System.out.println(redisStreamUtil.createGroup("queueName", "g2"));
+    }
+    @Test
+    public void testGroup() {
+        System.out.println(redisStreamUtil.queryGroups("queueName"));
+    }
 
+    @Test
+    public void xaddByGroup() {
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("key", "value1");
+        redisStreamUtil.xadd("queueName", hashMap);
+    }
+
+    @Test
+    public void xreadByGroup() {
+        System.out.println(redisStreamUtil.xreadOneByGroup("queueName", "g2", "c1"));
+    }
+    @Test
+    public void xreadByGroup1() {
+        System.out.println(redisStreamUtil.xreadOneByGroup("queueName", "g1", "c1"));
+    }
+
+    @Test
+    public void testXaddObject() {
+        UserOnlineDTO userOnlineDTO = new UserOnlineDTO();
+        userOnlineDTO.setUserName("wwwww");
+        final String q1 = redisStreamUtil.xadd("q1", userOnlineDTO, UserOnlineDTO.class);
+        System.out.println(q1);
+    }
+
+    @Test
+    public void testReadObject() {
+        System.out.println(redisStreamUtil.xreadObject("q1", 1L, UserOnlineDTO.class));
     }
 }
