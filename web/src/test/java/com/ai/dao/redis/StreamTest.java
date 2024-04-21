@@ -2,6 +2,7 @@ package com.ai.dao.redis;
 
 import com.ai.BaseTest;
 import com.ai.common.core.domain.dto.UserOnlineDTO;
+import com.ai.dao.redis.listener.MsgDemo;
 import com.ai.dao.redis.utils.RedisStreamUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,12 @@ public class StreamTest extends BaseTest {
 
     @Test
     public void testAdd() {
-        Map<String, Object> hashMap = new HashMap<>();
-        hashMap.put("key1", "value1");
-        redisStreamUtil.xadd("queueName", hashMap);
+        final MsgDemo msgDemo = new MsgDemo();
+        for (int i = 0; i < 20; i++) {
+            msgDemo.setId(String.valueOf(i));
+            redisStreamUtil.xadd("QUEUE1", msgDemo, MsgDemo.class);
+        }
+
     }
 
     @Test
@@ -86,4 +90,5 @@ public class StreamTest extends BaseTest {
     public void testReadObject() {
         System.out.println(redisStreamUtil.xreadObject("q1", 1L, UserOnlineDTO.class));
     }
+
 }

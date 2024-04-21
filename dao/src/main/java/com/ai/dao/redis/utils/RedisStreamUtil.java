@@ -1,6 +1,8 @@
 package com.ai.dao.redis.utils;
 
 
+import cn.hutool.core.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
@@ -10,10 +12,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class RedisStreamUtil {
 
     @Autowired
@@ -219,6 +223,23 @@ public class RedisStreamUtil {
     public PendingMessagesSummary pending(String key, String group) {
         PendingMessagesSummary pending = redisTemplate.opsForStream().pending(key, group);
         return pending;
+    }
+
+    public void initStream(String key, String group) {
+        //判断key是否存在，如果不存在则创建
+        boolean hasKey = true;
+        if (!ObjectUtil.isEmpty(key)){
+            hasKey = redisTemplate.hasKey(key);
+        }
+        if(!hasKey){
+            Map<String,Object> map = new HashMap<>();
+            map.put("field", "value");
+            String recordId = xadd(key, map);
+            createGroup(key,group);
+            //将初始化的值删除掉
+            xdel(key,recordId);
+            log.debug("stream:{}-group:{} initialize success",key,group);
+        }
     }
 }
 
