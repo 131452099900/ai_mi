@@ -38,7 +38,7 @@ public class MybatisPlusConfig {
     }
 
     /**
-     * 数据权限拦截器
+     * 数据权限拦截器  利用DataColumn和DataPermission进行权限校验
      */
     public PlusDataPermissionInterceptor dataPermissionInterceptor() {
         return new PlusDataPermissionInterceptor();
@@ -64,7 +64,7 @@ public class MybatisPlusConfig {
     }
 
     /**
-     * 元对象字段填充控制器
+     * 元对象字段填充控制器（insert，update通用字段填充）
      */
     @Bean
     public MetaObjectHandler metaObjectHandler() {

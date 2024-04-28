@@ -8,12 +8,15 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.ai.common.core.constant.TenantConstants;
 import com.ai.common.core.constant.UserConstants;
+import com.ai.common.core.domain.dto.RoleDTO;
 import com.ai.common.core.domain.model.LoginUser;
 import com.ai.common.core.enums.DeviceType;
 import com.ai.common.core.enums.UserType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -72,7 +75,19 @@ public class LoginHelper {
         if (loginUser != null) {
             return loginUser;
         }
-        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+//        loginUser = (LoginUser) StpUtil.getTokenSession().get(LOGIN_USER_KEY);
+        loginUser = new LoginUser();
+        loginUser.setUserId(1L);
+        loginUser.setRolePermission(new HashSet<>());
+        loginUser.setRoleId(0L);
+        final ArrayList<RoleDTO> objects = new ArrayList<>();
+        final RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setRoleId(1L);
+        roleDTO.setRoleKey("key");
+        roleDTO.setRoleName("dept");
+        roleDTO.setDataScope("5");
+        objects.add(roleDTO);
+        loginUser.setRoles(objects);
         SaHolder.getStorage().set(LOGIN_USER_KEY, loginUser);
         return loginUser;
     }

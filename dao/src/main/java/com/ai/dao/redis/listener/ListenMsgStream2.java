@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ListenMsgStream implements StreamListener<String , ObjectRecord<String, MsgDemo> > {
+public class ListenMsgStream2 implements StreamListener<String , ObjectRecord<String, MsgDemo>> {
 
     @Autowired
     private RedisStreamUtil redisStreamUtil;
@@ -17,10 +17,10 @@ public class ListenMsgStream implements StreamListener<String , ObjectRecord<Str
     //一个监听消息解析队列，一个监听消息记录队列
     @Override
     public void onMessage(ObjectRecord<String, MsgDemo> message) {
-        log.info("1--------------_>监听到一条消息");
+        log.info("2--------------_>监听到一条消息");
         System.out.println(message);
 
         // 手动ack
-        redisStreamUtil.ack(ListenerConfig.QUEUE1, ListenerConfig.QUEUE1_GROUP1, message.getId().getValue());
+        redisStreamUtil.ack(ListenerConfig.QUEUE1, ListenerConfig.QUEUE1_GROUP2, message.getId().getValue());
     }
 }

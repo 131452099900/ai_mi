@@ -39,9 +39,7 @@ import java.util.function.Function;
 /**
  * 数据权限过滤
  *
- * @author Lion Li
- * @version 3.5.0
- */
+\ */
 @Slf4j
 public class PlusDataPermissionHandler {
 
@@ -128,6 +126,7 @@ public class PlusDataPermissionHandler {
                 }
                 // 不包含 key 变量 则不处理
                 if (!StringUtils.containsAny(type.getSqlTemplate(),
+                    // 处理逻辑
                     Arrays.stream(dataColumn.key()).map(key -> "#" + key).toArray(String[]::new)
                 )) {
                     continue;

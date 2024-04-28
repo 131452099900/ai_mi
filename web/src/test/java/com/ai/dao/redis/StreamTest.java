@@ -1,13 +1,20 @@
 package com.ai.dao.redis;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.ai.BaseTest;
 import com.ai.common.core.domain.dto.UserOnlineDTO;
+import com.ai.dao.mybatis.mapper.TestDemoMapper;
+import com.ai.dao.redis.listener.ListenerConfig;
 import com.ai.dao.redis.listener.MsgDemo;
 import com.ai.dao.redis.utils.RedisStreamUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamInfo;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,14 +30,37 @@ import java.util.Map;
 public class StreamTest extends BaseTest {
 
     @Autowired
+    private PlatformTransactionManager platformTransactionManager;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    @Test
+    public void t() {
+        System.out.println(platformTransactionManager);
+        System.out.println(transactionTemplate);
+        System.out.println(transactionTemplate.getTransactionManager());
+    }
+
+    @Autowired
+    private TestDemoMapper testDemoMapper;
+    @Test
+    public void a() {
+        System.out.println(testDemoMapper.selectList());
+    }
+
+    @Autowired
     private RedisStreamUtil redisStreamUtil;
 
     @Test
-    public void testAdd() {
-        final MsgDemo msgDemo = new MsgDemo();
-        for (int i = 0; i < 20; i++) {
+    public void testAdd() throws InterruptedException {
+
+        for (int i = 0; i < 5; i++) {
+            MsgDemo msgDemo = new MsgDemo();
             msgDemo.setId(String.valueOf(i));
-            redisStreamUtil.xadd("QUEUE1", msgDemo, MsgDemo.class);
+            System.out.println(i);
+            redisStreamUtil.xadd(ListenerConfig.QUEUE1, msgDemo, MsgDemo.class);
+
         }
 
     }
@@ -75,7 +105,8 @@ public class StreamTest extends BaseTest {
     }
     @Test
     public void xreadByGroup1() {
-        System.out.println(redisStreamUtil.xreadOneByGroup("queueName", "g1", "c1"));
+        List<ObjectRecord<String, MsgDemo>> objectRecords = redisStreamUtil.xreadObjectGroup(ListenerConfig.QUEUE1, ListenerConfig.QUEUE1_GROUP2, ListenerConfig.QUEUE1_GROUP2_CONSUMER1, MsgDemo.class);
+        System.out.println(objectRecords);
     }
 
     @Test
@@ -88,7 +119,23 @@ public class StreamTest extends BaseTest {
 
     @Test
     public void testReadObject() {
-        System.out.println(redisStreamUtil.xreadObject("q1", 1L, UserOnlineDTO.class));
+        String key = "jhasgxasxgjasx";
+        redisStreamUtil.initStream(key, "g1");
+        redisStreamUtil.initStream(key, "g2");
+        for (int i = 0; i < 5; i++) {
+            MsgDemo msgDemo = new MsgDemo();
+            msgDemo.setId(String.valueOf(i));
+            redisStreamUtil.xadd(key, msgDemo, MsgDemo.class);
+        }
+
+        for (int i = 0; i < 5; i++) {
+            System.out.println(redisStreamUtil.xreadObjectGroup(key, "g1", "c1", MsgDemo.class));
+            System.out.println(redisStreamUtil.xreadObjectGroup(key, "g2", "c1", MsgDemo.class));
+        }
     }
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
 }

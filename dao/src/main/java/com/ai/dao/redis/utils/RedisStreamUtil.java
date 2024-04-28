@@ -100,6 +100,7 @@ public class RedisStreamUtil {
         return redisTemplate.opsForStream().delete(key, recordIds);
     }
 
+
     public <T>  List<ObjectRecord<String, T>> xreadObject(String key, Class<T> clazz) {
         List<ObjectRecord<String, T>> objectRecords = xreadObject(key, 1L, clazz);
         return objectRecords;
@@ -109,7 +110,7 @@ public class RedisStreamUtil {
         return read;
     }
     public <T> List<ObjectRecord<String, T>> xreadObjectGroup(String key, String group, String consumerName, Class<T> clazz) {
-        return xreadObjectGroup(key, group, consumerName, clazz);
+        return xreadObjectGroup(key, group, consumerName, 1L , clazz);
     }
     public <T> List<ObjectRecord<String, T>> xreadObjectGroup(String key, String group, String consumerName ,Long count, Class<T> clazz) {
         Consumer consumer = Consumer.from(group, consumerName);
@@ -225,21 +226,33 @@ public class RedisStreamUtil {
         return pending;
     }
 
-    public void initStream(String key, String group) {
+
+
+    public void initStream(String key, String... groups) {
         //判断key是否存在，如果不存在则创建
         boolean hasKey = true;
         if (!ObjectUtil.isEmpty(key)){
             hasKey = redisTemplate.hasKey(key);
         }
+
+//        // 如果ke存在就创建消费者组
         if(!hasKey){
             Map<String,Object> map = new HashMap<>();
             map.put("field", "value");
             String recordId = xadd(key, map);
-            createGroup(key,group);
+            for (int i = 0; i < groups.length; i++) {
+                createGroup(key, groups[i]);
+            }
             //将初始化的值删除掉
             xdel(key,recordId);
-            log.debug("stream:{}-group:{} initialize success",key,group);
+            log.debug("stream:{}-group:{} initialize success",key,groups);
         }
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("field", "value");
+//        String recordId = xadd(key, map);
+//        createGroup(key, groups[0]);
+//        xdel(key,recordId);
+
     }
 }
 

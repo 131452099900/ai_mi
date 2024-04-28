@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Mybatis异常处理器
- *
- * @author Lion Li
+ * Mybatis全局异常管理异常处理器
  */
 @Slf4j
 @RestControllerAdvice

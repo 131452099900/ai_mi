@@ -281,6 +281,7 @@
         <module>dao</module>
 <!--        <module>auth</module>-->
         <module>web</module>
+        <module>service-pom</module>
     </modules>
 
     <packaging>pom</packaging>
