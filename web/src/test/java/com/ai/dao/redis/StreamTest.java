@@ -7,6 +7,7 @@ import com.ai.dao.mybatis.mapper.TestDemoMapper;
 import com.ai.dao.redis.listener.ListenerConfig;
 import com.ai.dao.redis.listener.MsgDemo;
 import com.ai.dao.redis.utils.RedisStreamUtil;
+import lombok.AllArgsConstructor;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -42,7 +43,7 @@ public class StreamTest extends BaseTest {
         System.out.println(transactionTemplate.getTransactionManager());
     }
 
-    @Autowired
+//    @Autowired
     private TestDemoMapper testDemoMapper;
     @Test
     public void a() {

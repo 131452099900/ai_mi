@@ -20,6 +20,7 @@ public class ListenMsgStream implements StreamListener<String , ObjectRecord<Str
         log.info("1--------------_>监听到一条消息");
         System.out.println(message);
 
+
         // 手动ack
         redisStreamUtil.ack(ListenerConfig.QUEUE1, ListenerConfig.QUEUE1_GROUP1, message.getId().getValue());
     }

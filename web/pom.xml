@@ -65,6 +65,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>service-websocket</artifactId>
+            <version>1.0-</version>
+        </dependency>
 
     </dependencies>
 </project>
