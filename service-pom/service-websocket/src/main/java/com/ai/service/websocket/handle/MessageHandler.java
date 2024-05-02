@@ -10,6 +10,7 @@ import com.ai.service.websocket.model.WsMessage;
 import com.ai.service.websocket.model.WsSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -28,6 +29,8 @@ public class MessageHandler extends TextWebSocketHandler {
     @Autowired
     private RedisStreamUtil redisStreamUtil;
 
+    @Value("${server.name}")
+    private String name;
     /**
      * 连接建立后
      */
@@ -45,6 +48,7 @@ public class MessageHandler extends TextWebSocketHandler {
     }
 
 
+
     /**
      * 消息处理
      */
@@ -52,11 +56,12 @@ public class MessageHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message)  {
         log.info("======> 消息处理" + message.getPayload());
         WsMessage wsMessage = JsonUtils.parseObject(message.getPayload(), WsMessage.class);
-        System.out.println(wsMessage);
         WsSession wsSession = SessionManager.get(session.getId());
         final MsgDemo msgDemo = new MsgDemo();
         msgDemo.setId(message.getPayload());
+        msgDemo.setOrigin(name);
         redisStreamUtil.xadd(ListenerConfig.WEBSOCKET_QUEUE, msgDemo ,MsgDemo.class);
+
         if (ObjectUtil.isNull(wsMessage)) {
 //            final MsgDemo msgDemo = new MsgDemo();
 //            msgDemo.setId(message.getPayload());

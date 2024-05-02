@@ -9,4 +9,5 @@ import java.io.Serializable;
 public class WsMessage implements Serializable {
     private Integer type;
     private String data;
+    private String origin;
 }

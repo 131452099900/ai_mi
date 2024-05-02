@@ -149,6 +149,8 @@ public class ListenerConfig {
 ////
 
 
+    @Value("${server.name}")
+    private String name;
     @Bean
     public Subscription subscriptionMsgListener(RedisConnectionFactory factory) {
         StreamMessageListenerContainerOptions<String, ObjectRecord<String, MsgDemo>> options = buildOption();
@@ -156,8 +158,8 @@ public class ListenerConfig {
         StreamMessageListenerContainer<String, ObjectRecord<String, MsgDemo>> listenerContainer
                 = StreamMessageListenerContainer.create(factory, options);
 
-
-        ConsumerStreamReadRequest<String> request = buildRequest(WEBSOCKET_QUEUE, WEBSOCKET_QUEUE_GROUP + port, QUEUE1_GROUP1_CONSUMER1);
+        System.out.println(name);
+        ConsumerStreamReadRequest<String> request = buildRequest(WEBSOCKET_QUEUE, WEBSOCKET_QUEUE_GROUP + name, QUEUE1_GROUP1_CONSUMER1);
 
         //将监听类绑定到相应的stream流上
         Subscription subscription = listenerContainer.register(request, listenMsgStream);

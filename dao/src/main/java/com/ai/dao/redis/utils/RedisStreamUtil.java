@@ -234,19 +234,19 @@ public class RedisStreamUtil {
         if (!ObjectUtil.isEmpty(key)){
             hasKey = redisTemplate.hasKey(key);
         }
-
+        createGroup(key, groups[0]);
 //        // 如果ke存在就创建消费者组
-        if(!hasKey){
-            Map<String,Object> map = new HashMap<>();
-            map.put("field", "value");
-            String recordId = xadd(key, map);
-            for (int i = 0; i < groups.length; i++) {
-                createGroup(key, groups[i]);
-            }
-            //将初始化的值删除掉
-            xdel(key,recordId);
-            log.debug("stream:{}-group:{} initialize success",key,groups);
-        }
+//        if(!hasKey){
+//            Map<String,Object> map = new HashMap<>();
+//            map.put("field", "value");
+//            String recordId = xadd(key, map);
+//            for (int i = 0; i < groups.length; i++) {
+//                createGroup(key, groups[i]);
+//            }
+//            //将初始化的值删除掉
+//            xdel(key,recordId);
+//            log.debug("stream:{}-group:{} initialize success",key,groups);
+//        }
 //        Map<String,Object> map = new HashMap<>();
 //        map.put("field", "value");
 //        String recordId = xadd(key, map);
