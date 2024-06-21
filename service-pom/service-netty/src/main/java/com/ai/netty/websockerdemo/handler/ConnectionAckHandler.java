@@ -19,7 +19,7 @@ public class ConnectionAckHandler extends SimpleChannelInboundHandler<ClientConn
     protected void channelRead0(ChannelHandlerContext ctx, ClientConnectAckMsg msg) throws Exception {
         // 给server发送ack
         String to = msg.getTo();
-        MsgImpl ack = MsgImpl.ack(msg.getMsgId(),to);
+        MsgImpl ack = MsgImpl.ack(msg.getMsgId(),to, null);
         ctx.writeAndFlush(ack);
 
         // 1.改变connect ack的状态state

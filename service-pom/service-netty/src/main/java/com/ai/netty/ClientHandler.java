@@ -115,7 +115,7 @@ public class ClientHandler   extends SimpleChannelInboundHandler<Object> {
                     ctx.fireChannelRead(clientConnectAckMsg);
 
                     // 发送ack消息
-                    MsgImpl.ack();
+                    MsgImpl.ack(msgImpl.getTo(), "server", null);
                 } else if (msgType == 2) {
 
                 }

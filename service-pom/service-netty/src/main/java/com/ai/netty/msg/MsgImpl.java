@@ -1,5 +1,6 @@
 package com.ai.netty.msg;
 
+import com.ai.common.core.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,12 +50,14 @@ public class MsgImpl implements Serializable {
 
     private Integer retryNum;
 
-    public static MsgImpl ack(String msgId,String from) {
+    public static MsgImpl ack(String cid,String ccid, Object data) {
         MsgImpl msg = MsgImpl.builder()
-                .data(msgId)
-                .sessionId(UUID.randomUUID().toString())
-                .msgType(-1)
-                .build();
+                .version(0)
+                .msgType(1)
+                .from(cid)
+                .to(ccid)
+                .retryNum(0)
+                .sessionId(UUID.randomUUID().toString()).data(JsonUtils.toJsonString(data)).build();
         return msg;
     }
 
