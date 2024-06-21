@@ -71,5 +71,11 @@
             <version>1.0-</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>service-netty</artifactId>
+            <version>1.0-</version>
+        </dependency>
+
     </dependencies>
 </project>

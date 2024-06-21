@@ -15,6 +15,8 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamInfo;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.HashMap;
@@ -41,6 +43,8 @@ public class StreamTest extends BaseTest {
         System.out.println(platformTransactionManager);
         System.out.println(transactionTemplate);
         System.out.println(transactionTemplate.getTransactionManager());
+        final TransactionStatus transaction = transactionTemplate.getTransactionManager().getTransaction(new DefaultTransactionDefinition());
+//        transactionTemplate.getTransactionManager()I.commit();
     }
 
 //    @Autowired

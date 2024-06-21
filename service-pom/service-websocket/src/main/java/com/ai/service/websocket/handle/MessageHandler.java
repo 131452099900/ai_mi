@@ -56,26 +56,28 @@ public class MessageHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message)  {
         log.info("======> 消息处理" + message.getPayload());
         WsMessage wsMessage = JsonUtils.parseObject(message.getPayload(), WsMessage.class);
+        // 判断本地有无该session
         WsSession wsSession = SessionManager.get(session.getId());
-        final MsgDemo msgDemo = new MsgDemo();
-        msgDemo.setId(message.getPayload());
-        msgDemo.setOrigin(name);
-        redisStreamUtil.xadd(ListenerConfig.WEBSOCKET_QUEUE, msgDemo ,MsgDemo.class);
 
         if (ObjectUtil.isNull(wsMessage)) {
-//            final MsgDemo msgDemo = new MsgDemo();
-//            msgDemo.setId(message.getPayload());
-//            redisStreamUtil.xadd(ListenerConfig.WEBSOCKET_QUEUE, msgDemo ,MsgDemo.class);
+            final MsgDemo msgDemo = new MsgDemo();
+            msgDemo.setId(message.getPayload());
+            msgDemo.setOrigin(name);
+            redisStreamUtil.xadd(ListenerConfig.WEBSOCKET_QUEUE, msgDemo ,MsgDemo.class);
+
         } else {
-            final WsMessage wsMessage1 = new WsMessage();
-            wsMessage1.setData("返回数据");
-            wsMessage1.setType(2);
-            final String jsonString = JsonUtils.toJsonString(wsMessage1);
-            try {
-                wsSession.getWebSocketSession().sendMessage(new TextMessage(jsonString));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // 本地有
+            MsgHandlerFactory.getHandler(wsMessage.getType()).process(wsMessage, wsSession);
+
+//            final WsMessage wsMessage1 = new WsMessage();
+//            wsMessage1.setData("返回数据");
+//            wsMessage1.setType(2);
+//            final String jsonString = JsonUtils.toJsonString(wsMessage1);
+//            try {
+//                wsSession.getWebSocketSession().sendMessage(new TextMessage(jsonString));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 

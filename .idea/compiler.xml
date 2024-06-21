@@ -10,6 +10,7 @@
         <module name="dao" />
         <module name="common" />
         <module name="web" />
+        <module name="service-netty" />
         <module name="service-websocket" />
       </profile>
     </annotationProcessing>

@@ -42,7 +42,12 @@ public class ListenerConfig {
     private ConsumerStreamReadRequest<String> buildRequest(String key, String group, String consumerName) {
 
         // 创建stream和group信息
-        redisStreamUtil.initStream(key, group);
+        try {
+            redisStreamUtil.initStream(key, group);
+        } catch (Exception e) {
+            log.warn("group 已经存在");
+        }
+
 
         // 指定消费最新消息
         StreamOffset<String> lastMsgOffset = StreamOffset.create(key, ReadOffset.lastConsumed());
