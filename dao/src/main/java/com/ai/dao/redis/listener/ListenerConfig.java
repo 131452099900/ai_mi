@@ -154,7 +154,7 @@ public class ListenerConfig {
 ////
 
 
-    @Value("${server.name}")
+    @Value("${server.port}")
     private String name;
     @Bean
     public Subscription subscriptionMsgListener(RedisConnectionFactory factory) {

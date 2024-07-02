@@ -96,27 +96,19 @@ public class ClientHandler   extends SimpleChannelInboundHandler<Object> {
 
                 MsgImpl msgImpl = JSONUtil.toBean(jsonString, MsgImpl.class);
                 log.info("{}", msgImpl);
-                //2024-06-20T17:39:35.582+08:00  INFO 51431 --- [ntLoopGroup-9-1] com.ai.netty.ClientHandler               : MsgImpl(head=0, version=1, serviceType=null, msgType=1, logId=0, sessionId=3f08e16b-4cd2-426e-a04c-ebc89c4bbffd, dataLength=0, from=prod_111, to=stg_111, data={"msgId":null,"type":1,"version":0,"to":null,"from":null,"ackCcid":"prod_111","cid":"stg_111"}, env=null, retryNum=0)
-               // 17:39:36.000 [nioEventLoopGroup-2-1] INFO com.ai.netty.ClientHandler -- MsgImpl(head=0, version=2, serviceType=null, msgType=1, logId=0, sessionId=3f08e16b-4cd2-426e-a04c-ebc89c4bbffd, dataLength=0, from=prod_111, to=stg_111, data={"msgId":null,"type":1,"version":0,"to":null,"from":null,"ackCcid":"prod_111","cid":"stg_111"}, env=null, retryNum=1)
 
                 int msgType = msgImpl.getMsgType();
                 if (msgType == 1) {
                     // client connect notify
                     String data = msgImpl.getData();
                     ClientConnectAckMsg clientConnectAckMsg = JSONUtil.toBean(data, ClientConnectAckMsg.class);
-                    log.info("======== clientA 接收connect ack成功");
-                    // 5.1 设置任务
-                    TaskState taskState = TaskCache.get(msgImpl.getTo());
-                    taskState.setCcid(msgImpl.getFrom());
-                    taskState.setState(2);
-                    // 5.2 去除
-                    ConnectAckQueue.QUEUE_CA.remove(msgImpl.getTo());
-                    log.info("5.2 去除ack连接队列");
+                    clientConnectAckMsg.setSessionId(msgImpl.getSessionId());
+                    log.info("======== clientA 接收connect ack成功 {}", clientConnectAckMsg);
                     ctx.fireChannelRead(clientConnectAckMsg);
-
-                    // 发送ack消息
-                    MsgImpl.ack(msgImpl.getTo(), "server", null);
                 } else if (msgType == 2) {
+
+                } else if (msgType == -1) {
+                    // client端确认消息
 
                 }
             }

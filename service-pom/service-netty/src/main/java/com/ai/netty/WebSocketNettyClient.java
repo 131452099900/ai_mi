@@ -5,7 +5,9 @@ import com.ai.common.core.utils.JsonUtils;
 import com.ai.netty.msg.MsgImpl;
 import com.ai.netty.msg.codc.MsgDecoder;
 import com.ai.netty.msg.codc.MsgEncoder;
-import com.ai.netty.msg.ss.SerializationUtil;
+//import com.ai.netty.msg.ss.SerializationUtil;
+import com.ai.netty.server.handler.MyServiceClientHandler;
+import com.ai.netty.websockerdemo.handler.ConnectionAckHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -52,6 +54,8 @@ public class WebSocketNettyClient {
     }
 
     public NioSocketChannel connect(String host, Integer port, OnSuccessFuture onSuccessFuture, String params) {
+
+
         bootstrap.handler(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
@@ -59,14 +63,21 @@ public class WebSocketNettyClient {
 //                if (sslCtx != null) {
 //                    pipeline.addLast(sslCtx.newHandler(channel.alloc(), host, port));
 //                }
+
                 pipeline.addLast(new HttpClientCodec(),
                         new HttpObjectAggregator(65536),
                         WebSocketClientCompressionHandler.INSTANCE,
                         new IdleStateHandler(60, 0, 0),
                         //"token=1&env=stg&type=1&datasetId=989"
                         new ClientHandler(generateUri(host, port, params)));
+
+                // 业务
+                for (SimpleChannelInboundHandler serviceHandler : MyServiceClientHandler.serviceHandlers) {
+                    pipeline.addLast(serviceHandler);
+                }
             }
         });
+
 
         try {
             ChannelFuture channelFuture = bootstrap.connect(host, port).sync().addListener(onSuccessFuture::onFuture);

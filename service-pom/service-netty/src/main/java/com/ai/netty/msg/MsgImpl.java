@@ -1,5 +1,7 @@
 package com.ai.netty.msg;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.ai.common.core.utils.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,11 +55,14 @@ public class MsgImpl implements Serializable {
     public static MsgImpl ack(String cid,String ccid, Object data) {
         MsgImpl msg = MsgImpl.builder()
                 .version(0)
-                .msgType(1)
+                .msgType(-1)
                 .from(cid)
                 .to(ccid)
                 .retryNum(0)
-                .sessionId(UUID.randomUUID().toString()).data(JsonUtils.toJsonString(data)).build();
+                .sessionId(UUID.randomUUID().toString()).build();
+        if (ObjectUtil.isNotNull(data)) {
+            msg.setData(JSONUtil.toJsonStr(data));
+        }
         return msg;
     }
 

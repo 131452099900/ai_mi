@@ -29,7 +29,7 @@ public class MessageHandler extends TextWebSocketHandler {
     @Autowired
     private RedisStreamUtil redisStreamUtil;
 
-    @Value("${server.name}")
+    @Value("${server.port}")
     private String name;
     /**
      * 连接建立后

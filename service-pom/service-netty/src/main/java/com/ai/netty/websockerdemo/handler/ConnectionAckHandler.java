@@ -1,47 +1,59 @@
 package com.ai.netty.websockerdemo.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.ai.common.core.utils.JsonUtils;
 import com.ai.netty.msg.MsgImpl;
 import com.ai.netty.msg.impl.BaseMsg;
 import com.ai.netty.msg.impl.ClientConnectAckMsg;
 import com.ai.netty.msg.impl.InitMsg;
+import com.ai.netty.websockerdemo.cache.ConnectAckQueue;
+import com.ai.netty.websockerdemo.cache.TaskCache;
+import com.ai.netty.websockerdemo.manager.SessionManager;
+import com.ai.netty.websockerdemo.model.TaskState;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
+@Slf4j
+@Component
 public class ConnectionAckHandler extends SimpleChannelInboundHandler<ClientConnectAckMsg> {
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        super.channelRead(ctx, msg);
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, ClientConnectAckMsg msg) throws Exception {
+        System.out.println(msg);
+
         // 给server发送ack
-        String to = msg.getTo();
-        MsgImpl ack = MsgImpl.ack(msg.getMsgId(),to, null);
-        ctx.writeAndFlush(ack);
+        // 5.1 设置任务
+        String cid = msg.getCid();
+        String ccid = msg.getCcid();
+        System.out.println(ccid);
+        System.out.println(cid);
+        System.out.println(msg.getSessionId());
+        TaskState taskState = TaskCache.get(ccid);
+        taskState.setCcid(cid);
+        taskState.setState(2);
+        // 5.2 去除
+        ConnectAckQueue.QUEUE_CA.remove(ccid);
+        log.info("5.2 去除ack连接队列");
 
-        // 1.改变connect ack的状态state
+        // 5.3 发送ack消息
+        MsgImpl ackMsg = MsgImpl.ack(ccid, "server", msg.getSessionId());
+        if (ctx.channel().isActive()) {
+            log.info("发送消息了");
+            ctx.channel().writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(ackMsg)));
+        }
 
-        // 2.给server发送ack包
-
-        // 给client发送Init包
-//        MsgImpl msg1 = new MsgImpl();
-//        final InitMsg initMsg = new InitMsg();
-//        msg1.setMsgType(2);
-//        final String s = UUID.randomUUID().toString();
-//        msg1.setSessionId(s);
-//        msg1.setFrom(to);
-//        msg1.setTo(msg.getFrom());
-//        initMsg.setDatasetId(111L);
-//        initMsg.setVersion(1);
-//        initMsg.setMsgId(s);
-//        initMsg.setCount(1000);
-//        initMsg.setPartitions(new ArrayList<>());
-//
-//        msg1.setData(JSON.parseObject(JsonUtils.toJsonString(initMsg)));
-//        ctx.channel().writeAndFlush(new TextWebSocketFrame(JsonUtils.toJsonString(initMsg)));
     }
 }
 

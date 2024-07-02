@@ -2,7 +2,7 @@ package com.ai.netty.server.handler;
 
 import cn.hutool.json.JSONUtil;
 import com.ai.netty.msg.MsgImpl;
-import com.ai.netty.msg.ss.SerializationUtil;
+//import com.ai.netty.msg..SerializationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -38,14 +38,14 @@ public class BaseWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
 
 
         //      判断是否是二进制消息，如果是二进制消息，就抛出异常
-        if(frame instanceof BinaryWebSocketFrame) {
-            ByteBuf content = frame.content();
-            byte[] bytes = new byte[content.capacity()];
-            content.readBytes(bytes);
-            MsgImpl deserialize = (MsgImpl) SerializationUtil.deserialize(bytes);
-            System.out.println(deserialize);
-        }
-
+//        if(frame instanceof BinaryWebSocketFrame) {
+//            ByteBuf content = frame.content();
+//            byte[] bytes = new byte[content.capacity()];
+//            content.readBytes(bytes);
+//            MsgImpl deserialize = (MsgImpl) SerializationUtil.deserialize(bytes);
+//            System.out.println(deserialize);
+//        }
+////
         if (frame instanceof TextWebSocketFrame) {
             String s = frame.content().toString(StandardCharsets.UTF_8);
             MsgImpl msg = JSONUtil.toBean(s, MsgImpl.class);

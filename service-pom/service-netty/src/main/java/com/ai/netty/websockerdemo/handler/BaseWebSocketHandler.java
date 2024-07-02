@@ -2,8 +2,11 @@ package com.ai.netty.websockerdemo.handler;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import com.ai.common.core.utils.JsonUtils;
 import com.ai.netty.msg.MsgImpl;
+import com.ai.netty.msg.impl.AckMsg;
+import com.ai.netty.msg.impl.BaseMsg;
 import com.ai.netty.msg.impl.ClientConnectAckMsg;
 import com.ai.netty.websockerdemo.RequestEnum;
 import com.ai.netty.websockerdemo.cache.AckQueue;
@@ -42,6 +45,8 @@ public class BaseWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
+
+//        log.info("======================> WebSocketFrame {}", msg);
         if(msg instanceof CloseWebSocketFrame) {
             ctx.channel().close();
         }
@@ -58,17 +63,18 @@ public class BaseWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
             String jsonString = buf.toString(StandardCharsets.UTF_8);
 
             MsgImpl msgImpl = JsonUtils.parseObject(jsonString, MsgImpl.class);
-
+            System.out.println(msgImpl);
             int msgType = msgImpl.getMsgType();
-            if (msgType == 0) {
-                // client connect notify
-                String data = msgImpl.getData();
-                ClientConnectAckMsg clientConnectAckMsg = JsonUtils.parseObject(data, ClientConnectAckMsg.class);
-                ctx.fireChannelRead(clientConnectAckMsg);
-            } else if (msgType == 1) {
-                // msgType = 1 ack连接包 取消ack连接
-
+            BaseMsg baseMsg = null;
+            if (msgType == -1) {
+                // msgType = -1 ack连接包 取消ack连接
+                AckMsg ackMsg = new AckMsg();
+                ackMsg.setAckSessionId(msgImpl.getData());
+                baseMsg = ackMsg;
+                ctx.fireChannelRead(ackMsg);
+//                AckQueue.remove(msgImpl.getData());
             }
+//            ctx.fireChannelRead(baseMsg);
         }
     }
 
@@ -127,18 +133,22 @@ public class BaseWebSocketHandler extends SimpleChannelInboundHandler<WebSocketF
                     // TODO 暂时不考虑消息可靠   后面使用队列代替
                     // 2,给clientA发送连接ACK包 msgType = 1
                     ClientConnectAckMsg clientConnectAckMsg = new ClientConnectAckMsg();
-                    clientConnectAckMsg.setAckCcid(cid);
-                    clientConnectAckMsg.setCid(ccid);
+                    clientConnectAckMsg.setCid(cid);
+                    clientConnectAckMsg.setCcid(ccid);
+                    String s = JSONUtil.toJsonStr(clientConnectAckMsg);
                     MsgImpl msg = MsgImpl.builder()
                             .version(1)
                             .msgType(1)
                             .from(cid)
                             .to(ccid)
                             .retryNum(0)
-                            .sessionId(UUID.randomUUID().toString()).data(JsonUtils.toJsonString(clientConnectAckMsg)).build();
+                            .sessionId(UUID.randomUUID().toString()).data(s).build();
                     log.info("{}, {}", ccid, cid);
+
+
+
                     SessionManager.sendToOne(ccid, msg, clientConnectAckMsg);
-                    log.info("=======> ClientB给ClientA发送connect ack包");
+                    log.info("=======> ClientB给ClientA发送connect ack包 {}", msg.getSessionId());
 
                     // 3,把该ack包加入队列
                     AckQueue.QUEUE.put(msg.getSessionId(), msg);

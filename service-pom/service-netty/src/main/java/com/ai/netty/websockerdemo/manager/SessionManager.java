@@ -72,7 +72,6 @@ public class SessionManager {
         if (nioSocketChannel.isActive() && nioSocketChannel.isWritable()) {
             TextWebSocketFrame frame = new TextWebSocketFrame(JSONUtil.toJsonStr(protocol));
             nioSocketChannel.writeAndFlush(frame).sync().addListener(future -> {
-                log.info(future + "asdasdasdasdasd");
                         if (future.isSuccess()) {
                             log.info("===============>成功发送消息啦");
                         }

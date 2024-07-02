@@ -6,9 +6,9 @@ import lombok.Data;
 // type = 1 发起连接 client B ack
 @Data
 public class ClientConnectAckMsg extends BaseMsg{
-    String ackCcid;
-    String cid;
-    public ClientConnectAckMsg() {
-        super.type = 1;
-    }
+
+
+//    public ClientConnectAckMsg() {
+//        super.type = 1;
+//    }
 }

@@ -2,6 +2,7 @@ package com.ai.netty.server.handler;
 
 import com.ai.netty.msg.codc.MsgDecoder;
 import com.ai.netty.msg.codc.MsgEncoder;
+import com.ai.netty.websockerdemo.handler.MsgAckHandler;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -40,10 +41,12 @@ public class MyWebSocketHandler extends ChannelInitializer<SocketChannel> {
         // 5 心跳
 //        pipeline.addLast(new IdleStateHandler(9, -1, -1, TimeUnit.SECONDS));
 
+        // 6 baseHandler
         pipeline.addLast("wsBaseHandler", new com.ai.netty.websockerdemo.handler.BaseWebSocketHandler());
 
-        //
-//        pipeline.addLast("msgHandler", new MsgHandler());
+        // ackHandlr
+        pipeline.addLast("ackHandler", new MsgAckHandler());
+
 //        pipeline.addLast("BinaryWebSocketFrameHandler", new BinaryWebSocketFrameHandler());
     }
 }

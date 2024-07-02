@@ -15,7 +15,7 @@ public class ListenMsgStream implements StreamListener<String , ObjectRecord<Str
     @Autowired
     private RedisStreamUtil redisStreamUtil;
 
-    @Value("${server.name}")
+    @Value("${server.port}")
     private String name;
     //一个监听消息解析队列，一个监听消息记录队列
     @Override

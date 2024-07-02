@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class BaseMsg {
-    String msgId;
+    String sessionId;
     int type;
     int version;
-    String to;
-    String from;
+    String cid;
+    String ccid;
 }
